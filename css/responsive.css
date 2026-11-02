@@ -1,0 +1,182 @@
+/* ========================================================
+   FINORA – Responsive Design & Mobile Stylesheet
+   ======================================================== */
+
+/* Large Tablets & Small Laptops */
+@media (max-width: 1200px) {
+  .summary-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .dashboard-split-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .analytics-grid-two {
+    grid-template-columns: 1fr;
+  }
+
+  .financial-metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Tablets (portrait) & Smaller Screens */
+@media (max-width: 992px) {
+  .summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .advisor-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .rule-bars-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .spending-breakdown-wrapper {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+
+  .donut-chart-container {
+    margin-bottom: 16px;
+  }
+}
+
+/* Mobile Devices */
+@media (max-width: 768px) {
+  /* Sidebar Mobile Drawer */
+  .sidebar {
+    transform: translateX(-100%);
+    width: 280px;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
+  }
+
+  .sidebar.show {
+    transform: translateX(0);
+  }
+
+  .sidebar-close-btn {
+    display: block;
+  }
+
+  /* Overlay backdrop for mobile drawer */
+  .sidebar-backdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.5);
+    backdrop-filter: blur(2px);
+    z-index: 95;
+  }
+
+  .sidebar-backdrop.active {
+    display: block;
+  }
+
+  .main-wrapper {
+    margin-left: 0;
+  }
+
+  .menu-toggle-btn {
+    display: block;
+  }
+
+  /* Topbar Mobile */
+  .topbar {
+    padding: 0 16px;
+    height: 64px;
+  }
+
+  .date-indicator {
+    display: none;
+  }
+
+  .page-body {
+    padding: 16px;
+  }
+
+  /* Welcome Banner Mobile */
+  .welcome-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 20px;
+  }
+
+  .welcome-info {
+    max-width: 100%;
+  }
+
+  .welcome-badge-group {
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  /* Summary Cards */
+  .summary-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  /* Forms */
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  /* Table Controls */
+  .table-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-group {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .filter-select {
+    flex: 1;
+  }
+
+  .search-box {
+    width: 100%;
+  }
+
+  /* Financial Metrics */
+  .financial-metrics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Modal Adjustments */
+  .modal-box {
+    margin: 12px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+}
+
+/* Extra Small Devices */
+@media (max-width: 480px) {
+  .welcome-greeting {
+    font-size: 19px;
+  }
+
+  .summary-value {
+    font-size: 20px;
+  }
+
+  .btn-add-money-quick span {
+    display: none;
+  }
+
+  .btn-add-money-quick {
+    padding: 9px 12px;
+  }
+}

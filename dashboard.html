@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard | FINORA – Personal Finance</title>
+  <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
+  
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <!-- Custom Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+  <!-- Mobile Backdrop Overlay -->
+  <div id="sidebarBackdrop" class="sidebar-backdrop"></div>
+
+  <div class="app-container">
+    <!-- ========================================================
+         SIDEBAR NAVIGATION
+         ======================================================== -->
+    <aside id="appSidebar" class="sidebar">
+      <div class="sidebar-header">
+        <a href="dashboard.html" class="sidebar-brand">
+          <img src="assets/images/logo-light.svg" alt="FINORA Logo">
+        </a>
+        <button id="sidebarCloseBtn" class="sidebar-close-btn" aria-label="Close sidebar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <nav class="sidebar-menu">
+        <div class="menu-label">Main Menu</div>
+        
+        <a class="nav-item active" data-tab="overview">
+          <i class="fa-solid fa-chart-pie"></i>
+          <span>Overview</span>
+        </a>
+
+        <a class="nav-item" data-tab="analytics">
+          <i class="fa-solid fa-chart-line"></i>
+          <span>Analytics</span>
+        </a>
+
+        <a class="nav-item" data-tab="advisor">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+          <span>AI Advisor</span>
+          <span class="nav-badge">Smart</span>
+        </a>
+
+        <a class="nav-item" data-tab="transactions">
+          <i class="fa-solid fa-receipt"></i>
+          <span>Transactions</span>
+        </a>
+
+        <div class="menu-label">Quick Actions</div>
+
+        <a class="nav-item" data-tab="add-money">
+          <i class="fa-solid fa-circle-plus" style="color:#10B981;"></i>
+          <span>Add Money</span>
+        </a>
+      </nav>
+
+      <!-- Sidebar User Profile Footer -->
+      <div class="sidebar-footer">
+        <div class="user-profile-badge">
+          <div id="sidebarUserAvatar" class="user-avatar">U</div>
+          <div class="user-details">
+            <div id="sidebarUserName" class="user-name">Loading...</div>
+            <div id="sidebarUserEmail" class="user-email">...</div>
+          </div>
+          <button id="btnSidebarLogout" class="btn-sidebar-logout" title="Sign Out">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ========================================================
+         MAIN APPLICATION CONTENT AREA
+         ======================================================== -->
+    <main class="main-wrapper">
+      <!-- Top Navigation Header -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button id="mobileMenuToggle" class="menu-toggle-btn" aria-label="Open sidebar menu">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          <div class="page-title-box">
+            <h1 id="pageTitleText">Dashboard Overview</h1>
+            <p id="pageSubtitleText">Monitor your net balance, recent flows and instant actions</p>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <div class="date-indicator">
+            <i class="fa-regular fa-calendar-days"></i>
+            <span id="currentDateDisplay">...</span>
+          </div>
+
+          <button id="btnQuickAddMoney" class="btn-add-money-quick">
+            <i class="fa-solid fa-plus"></i>
+            <span>Add Money</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Page Body -->
+      <div class="page-body">
+
+        <!-- Optional Supabase Setup Notice Banner (Visible only if Supabase credentials are unconfigured) -->
+        <div id="configAlertBanner" class="config-alert-banner" style="display:none;">
+          <div class="config-alert-content">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <div>
+              <strong>Local Demo Mode Active:</strong> You are currently testing FINORA with isolated local storage. Connect your real Supabase project to enable cloud sync and PostgreSQL persistence.
+            </div>
+          </div>
+          <button class="btn-banner-action" onclick="openModal('supabaseConfigModal')">
+            <i class="fa-solid fa-plug"></i> Connect Supabase
+          </button>
+        </div>
+
+        <!-- ========================================================
+             TAB 1: DASHBOARD OVERVIEW
+             ======================================================== -->
+        <section id="tab-overview" class="tab-view active">
+          
+          <!-- Welcome Section -->
+          <div class="welcome-banner">
+            <div class="welcome-info">
+              <div class="welcome-greeting">
+                Welcome back, <span id="welcomeUserName">User</span> 👋
+              </div>
+              <div class="welcome-quote">
+                <i class="fa-solid fa-quote-left"></i>
+                <span id="financialQuoteText">Loading financial insight...</span>
+              </div>
+            </div>
+
+            <div class="welcome-badge-group">
+              <div class="finora-status-pill">
+                <span class="status-dot"></span>
+                <span>FINORA – Personal Finance</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Financial Summary Cards (5 Key Metrics) -->
+          <div class="summary-grid">
+            <!-- Total Balance -->
+            <div class="summary-card">
+              <div class="summary-card-header">
+                <span class="summary-title">Total Balance</span>
+                <div class="summary-icon-box icon-balance">
+                  <i class="fa-solid fa-wallet"></i>
+                </div>
+              </div>
+              <div id="summaryTotalBalance" class="summary-value">$0.00</div>
+              <div class="summary-meta">
+                <span id="balanceTrendBadge" class="trend-pill trend-up">
+                  <i class="fa-solid fa-arrow-trend-up"></i> Positive
+                </span>
+                <span>Net Cash</span>
+              </div>
+            </div>
+
+            <!-- Total Income -->
+            <div class="summary-card">
+              <div class="summary-card-header">
+                <span class="summary-title">Total Income</span>
+                <div class="summary-icon-box icon-income">
+                  <i class="fa-solid fa-arrow-down-left"></i>
+                </div>
+              </div>
+              <div id="summaryTotalIncome" class="summary-value" style="color:var(--income);">$0.00</div>
+              <div class="summary-meta">
+                <span class="trend-pill trend-up"><i class="fa-solid fa-arrow-up"></i> Inflow</span>
+                <span>Total earned</span>
+              </div>
+            </div>
+
+            <!-- Total Spending -->
+            <div class="summary-card">
+              <div class="summary-card-header">
+                <span class="summary-title">Total Spending</span>
+                <div class="summary-icon-box icon-expense">
+                  <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                </div>
+              </div>
+              <div id="summaryTotalExpense" class="summary-value" style="color:var(--expense);">$0.00</div>
+              <div class="summary-meta">
+                <span class="trend-pill trend-down"><i class="fa-solid fa-arrow-down"></i> Outflow</span>
+                <span>Total expenses</span>
+              </div>
+            </div>
+
+            <!-- Savings Rate -->
+            <div class="summary-card">
+              <div class="summary-card-header">
+                <span class="summary-title">Savings Rate</span>
+                <div class="summary-icon-box icon-savings">
+                  <i class="fa-solid fa-piggy-bank"></i>
+                </div>
+              </div>
+              <div id="summarySavingsRate" class="summary-value">0%</div>
+              <div class="summary-meta">
+                <span class="trend-pill trend-up">Target 20%+</span>
+                <span>Of total income</span>
+              </div>
+            </div>
+
+            <!-- Total Transactions -->
+            <div class="summary-card">
+              <div class="summary-card-header">
+                <span class="summary-title">Transactions</span>
+                <div class="summary-icon-box icon-count">
+                  <i class="fa-solid fa-list-check"></i>
+                </div>
+              </div>
+              <div id="summaryTotalCount" class="summary-value">0</div>
+              <div class="summary-meta">
+                <span class="trend-pill trend-neutral">Activity</span>
+                <span>Logged entries</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Split Row: Quick Add Transaction & Spending Overview -->
+          <div class="dashboard-split-grid">
+            
+            <!-- Quick Action: Add Transaction -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-header-title">
+                  <i class="fa-solid fa-plus-circle"></i>
+                  <div>
+                    <h2>Quick Add Transaction</h2>
+                    <div class="card-subtitle">Log income or expenses to your database</div>
+                  </div>
+                </div>
+              </div>
+
+              <form id="quickAddTxnForm" class="quick-form">
+                <!-- Type Toggle (Expense or Income) -->
+                <div class="form-group">
+                  <label>Transaction Type</label>
+                  <div class="type-toggle-group">
+                    <button type="button" class="type-toggle-btn active-expense" data-type="expense">
+                      <i class="fa-solid fa-arrow-down"></i> Expense
+                    </button>
+                    <button type="button" class="type-toggle-btn" data-type="income">
+                      <i class="fa-solid fa-arrow-up"></i> Income
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Description -->
+                <div class="form-group">
+                  <label for="txnDescription">Description</label>
+                  <input type="text" id="txnDescription" class="form-input" placeholder="e.g. Grocery Store, Client Payment" required>
+                </div>
+
+                <!-- Amount & Date Row -->
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="txnAmount">Amount ($)</label>
+                    <input type="number" id="txnAmount" class="form-input" step="0.01" min="0.01" placeholder="0.00" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="txnDate">Date</label>
+                    <input type="date" id="txnDate" class="form-input" required>
+                  </div>
+                </div>
+
+                <!-- Category -->
+                <div class="form-group">
+                  <label for="txnCategory">Category</label>
+                  <select id="txnCategory" class="form-select" required>
+                    <option value="" disabled selected>Select Category</option>
+                  </select>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" id="btnSubmitTxn" class="btn-submit-transaction">
+                  <i class="fa-solid fa-plus"></i>
+                  <span>Add Transaction</span>
+                </button>
+              </form>
+            </div>
+
+            <!-- Spending Overview & Doughnut Breakdown -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-header-title">
+                  <i class="fa-solid fa-chart-pie"></i>
+                  <div>
+                    <h2>Spending Overview</h2>
+                    <div class="card-subtitle">Expense distribution by category</div>
+                  </div>
+                </div>
+                <div style="text-align:right;">
+                  <span style="font-size:11px;color:var(--text-muted);display:block;">Total Spent</span>
+                  <span id="overviewTotalSpent" style="font-size:15px;font-weight:800;color:var(--expense);font-family:'Plus Jakarta Sans',sans-serif;">$0.00</span>
+                </div>
+              </div>
+
+              <div class="spending-breakdown-wrapper">
+                <div class="donut-chart-container">
+                  <canvas id="miniSpendingDonut"></canvas>
+                  <div class="donut-center-label">
+                    <div class="donut-center-sub">Total</div>
+                    <div class="donut-center-val">Spend</div>
+                  </div>
+                </div>
+
+                <div id="categoryProgressList" class="category-progress-list">
+                  <!-- Dynamic Category Bars -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- AI Financial Advisor Card -->
+          <div class="card advisor-card" style="margin-bottom:24px;">
+            <div class="card-header">
+              <div class="card-header-title">
+                <span class="advisor-badge">
+                  <i class="fa-solid fa-sparkles"></i> AI Advisor
+                </span>
+                <div>
+                  <h2>Smart Financial Diagnostics</h2>
+                  <div class="card-subtitle">Rule-based intelligence derived from your transaction habits</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="advisor-grid">
+              <!-- Health Score Gauge -->
+              <div class="health-score-container">
+                <div class="score-circle-wrapper">
+                  <svg class="score-circle-svg" viewBox="0 0 140 140">
+                    <circle class="score-circle-bg" cx="70" cy="70" r="60"></circle>
+                    <circle id="healthScoreCircle" class="score-circle-bar" cx="70" cy="70" r="60"></circle>
+                  </svg>
+                  <div id="healthScoreVal" class="score-value-text">0</div>
+                </div>
+                <div style="font-size:13px;font-weight:700;color:var(--text-primary);">Financial Health Score</div>
+                <div id="healthScoreBadge" class="score-rating-badge rating-good">Evaluating</div>
+              </div>
+
+              <!-- AI Recommendations List -->
+              <div id="advisorInsightsList" class="advisor-insights-container">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+
+            <!-- 50/30/20 Rule Audit Breakdown -->
+            <div class="budget-rule-section">
+              <div class="budget-rule-header">
+                <h3><i class="fa-solid fa-scale-balanced" style="color:var(--primary);"></i> 50 / 30 / 20 Budget Rule Check</h3>
+                <span style="font-size:11.5px;color:var(--text-muted);">Standard: 50% Needs, 30% Wants, 20% Savings</span>
+              </div>
+              <div id="budgetRuleBars" class="rule-bars-grid">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Transactions Preview -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-header-title">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                <div>
+                  <h2>Recent Transactions</h2>
+                  <div class="card-subtitle">Your latest 5 financial activities</div>
+                </div>
+              </div>
+              <button class="btn-secondary" onclick="switchTab('transactions')">
+                <span>View All</span>
+                <i class="fa-solid fa-arrow-right" style="font-size:11px;margin-left:4px;"></i>
+              </button>
+            </div>
+
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Description</th>
+                    <th>Category</th>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="recentTransactionsBody">
+                  <!-- Dynamically rendered -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================================================
+             TAB 2: ANALYTICS
+             ======================================================== -->
+        <section id="tab-analytics" class="tab-view">
+          
+          <!-- Key Metrics Grid -->
+          <div class="financial-metrics-grid">
+            <div class="metric-card">
+              <h4>Average Transaction</h4>
+              <div id="metricAvgTxn" class="metric-val">$0.00</div>
+              <div class="metric-desc">Mean across all records</div>
+            </div>
+            <div class="metric-card">
+              <h4>Monthly Burn Rate</h4>
+              <div id="metricBurnRate" class="metric-val" style="color:var(--expense);">$0.00</div>
+              <div class="metric-desc">Current month outflow</div>
+            </div>
+            <div class="metric-card">
+              <h4>Daily Average Spend</h4>
+              <div id="metricDailySpend" class="metric-val">$0.00</div>
+              <div class="metric-desc">Normalized per active day</div>
+            </div>
+            <div class="metric-card">
+              <h4>Peak Single Expense</h4>
+              <div id="metricTopExpense" class="metric-val" style="color:var(--warning);">$0.00</div>
+              <div class="metric-desc">Highest single charge</div>
+            </div>
+          </div>
+
+          <!-- Charts Grid (Two Columns) -->
+          <div class="analytics-grid-two">
+            <!-- Income vs Expenses Bar Chart -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-header-title">
+                  <i class="fa-solid fa-chart-column"></i>
+                  <div>
+                    <h2>Income vs. Expenses</h2>
+                    <div class="card-subtitle">Monthly cash comparison</div>
+                  </div>
+                </div>
+              </div>
+              <div class="analytics-chart-box">
+                <canvas id="incomeExpenseChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Category Spending Doughnut -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-header-title">
+                  <i class="fa-solid fa-chart-pie"></i>
+                  <div>
+                    <h2>Category Breakdown</h2>
+                    <div class="card-subtitle">Where your money goes</div>
+                  </div>
+                </div>
+              </div>
+              <div class="analytics-chart-box">
+                <canvas id="categoryDonutChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cash Flow / Balance Trend (Full Width) -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-header-title">
+                <i class="fa-solid fa-chart-line"></i>
+                <div>
+                  <h2>Net Cash Flow & Balance Trajectory</h2>
+                  <div class="card-subtitle">Cumulative account growth over recorded history</div>
+                </div>
+              </div>
+            </div>
+            <div class="analytics-chart-box" style="height: 280px;">
+              <canvas id="cashflowTrendChart"></canvas>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================================================
+             TAB 3: AI ADVISOR (DEDICATED VIEW)
+             ======================================================== -->
+        <section id="tab-advisor" class="tab-view">
+          <div class="card advisor-card" style="margin-bottom:24px;">
+            <div class="card-header">
+              <div class="card-header-title">
+                <span class="advisor-badge">
+                  <i class="fa-solid fa-robot"></i> FINORA AI Advisor Engine
+                </span>
+                <div>
+                  <h2>Comprehensive Financial Diagnostics</h2>
+                  <div class="card-subtitle">Deep algorithmic analysis of your income, expenses, and savings resilience</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Health Score & Diagnostics -->
+            <div class="advisor-grid" style="margin-bottom: 24px;">
+              <div class="health-score-container">
+                <div class="score-circle-wrapper">
+                  <svg class="score-circle-svg" viewBox="0 0 140 140">
+                    <circle class="score-circle-bg" cx="70" cy="70" r="60"></circle>
+                    <circle class="score-circle-bar" cx="70" cy="70" r="60" style="stroke:var(--primary); stroke-dashoffset:90;"></circle>
+                  </svg>
+                  <div class="score-value-text" style="font-size:32px;">Finora</div>
+                </div>
+                <div style="font-size:14px;font-weight:700;color:var(--text-primary);">Health Rating</div>
+                <p style="font-size:12px;color:var(--text-muted);margin-top:4px;">Calculated dynamically from live ledger records</p>
+              </div>
+
+              <!-- Key Pillars -->
+              <div style="display:flex;flex-direction:column;gap:12px;">
+                <div class="insight-item">
+                  <div class="insight-icon insight-icon-success"><i class="fa-solid fa-shield-halved"></i></div>
+                  <div class="insight-content">
+                    <h4>Capital Preservation Protocol</h4>
+                    <p>Maintaining a minimum 3-month emergency fund shields you from debt traps during unforeseen events.</p>
+                  </div>
+                </div>
+                <div class="insight-item">
+                  <div class="insight-icon insight-icon-info"><i class="fa-solid fa-seedling"></i></div>
+                  <div class="insight-content">
+                    <h4>Compound Growth Principle</h4>
+                    <p>Redirecting recurring surplus into index funds or high-yield vehicles maximizes compound interest benefits.</p>
+                  </div>
+                </div>
+                <div class="insight-item">
+                  <div class="insight-icon insight-icon-warning"><i class="fa-solid fa-filter-circle-dollar"></i></div>
+                  <div class="insight-content">
+                    <h4>The 24-Hour Rule</h4>
+                    <p>For any non-essential purchase over $100, wait 24 hours before completing the checkout to eliminate impulse spending.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================================================
+             TAB 4: TRANSACTIONS (FULL MANAGEMENT)
+             ======================================================== -->
+        <section id="tab-transactions" class="tab-view">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-header-title">
+                <i class="fa-solid fa-receipt"></i>
+                <div>
+                  <h2>All Transactions</h2>
+                  <div class="card-subtitle">Search, filter, edit, or delete any record</div>
+                </div>
+              </div>
+              <button class="btn-submit-transaction" onclick="switchTab('overview')">
+                <i class="fa-solid fa-plus"></i> New Transaction
+              </button>
+            </div>
+
+            <!-- Filter Toolbar -->
+            <div class="table-toolbar">
+              <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="txnSearchInput" class="search-input" placeholder="Search by description or category...">
+              </div>
+
+              <div class="filter-group">
+                <select id="txnTypeFilter" class="filter-select">
+                  <option value="all">All Types</option>
+                  <option value="income">Income Only</option>
+                  <option value="expense">Expense Only</option>
+                </select>
+
+                <select id="txnCategoryFilter" class="filter-select">
+                  <option value="all">All Categories</option>
+                </select>
+
+                <select id="txnSortFilter" class="filter-select">
+                  <option value="newest">Newest First</option>
+                  <option value="oldest">Oldest First</option>
+                  <option value="highest">Highest Amount</option>
+                  <option value="lowest">Lowest Amount</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Data Table -->
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Description</th>
+                    <th>Category</th>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="allTransactionsBody">
+                  <!-- Dynamically rendered -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- ========================================================
+       MODALS
+       ======================================================== -->
+
+  <!-- Edit Transaction Modal -->
+  <div id="editTxnModal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fa-solid fa-pen-to-square" style="color:var(--primary);"></i>
+          <span>Edit Transaction</span>
+        </div>
+        <button type="button" class="btn-close-modal" onclick="closeModal('editTxnModal')">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <form id="editTxnForm">
+        <div class="modal-body" style="display:flex;flex-direction:column;gap:14px;">
+          <div class="form-group">
+            <label for="editTxnDesc">Description</label>
+            <input type="text" id="editTxnDesc" class="form-input" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="editTxnAmount">Amount ($)</label>
+              <input type="number" id="editTxnAmount" class="form-input" step="0.01" min="0.01" required>
+            </div>
+            <div class="form-group">
+              <label for="editTxnDate">Date</label>
+              <input type="date" id="editTxnDate" class="form-input" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="editTxnType">Type</label>
+              <select id="editTxnType" class="form-select" required>
+                <option value="expense">Expense</option>
+                <option value="income">Income</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="editTxnCategory">Category</label>
+              <select id="editTxnCategory" class="form-select" required></select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" onclick="closeModal('editTxnModal')">Cancel</button>
+          <button type="submit" id="btnSaveEditTxn" class="btn-submit-transaction">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div id="deleteTxnModal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 420px;">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fa-solid fa-triangle-exclamation" style="color:var(--expense);"></i>
+          <span>Delete Transaction</span>
+        </div>
+        <button type="button" class="btn-close-modal" onclick="closeModal('deleteTxnModal')">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:14px;color:var(--text-secondary);line-height:1.5;">
+          Are you sure you want to delete this transaction record? This action is permanent and cannot be undone.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" onclick="closeModal('deleteTxnModal')">Cancel</button>
+        <button type="button" id="btnConfirmDelete" class="btn-danger" onclick="confirmDeleteTxn()">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Supabase Quick Configuration Modal -->
+  <div id="supabaseConfigModal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fa-solid fa-plug" style="color:var(--primary);"></i>
+          <span>Connect Supabase Project</span>
+        </div>
+        <button type="button" class="btn-close-modal" onclick="closeModal('supabaseConfigModal')">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-body" style="display:flex;flex-direction:column;gap:14px;">
+        <p style="font-size:13px;color:var(--text-secondary);">
+          Paste your project credentials from your <a href="https://supabase.com/dashboard" target="_blank" style="color:var(--primary);font-weight:600;">Supabase Dashboard</a> (Settings &rarr; API).
+        </p>
+        <div class="form-group">
+          <label for="setupSupabaseUrl">Supabase Project URL</label>
+          <input type="text" id="setupSupabaseUrl" class="form-input" placeholder="https://xyzcompany.supabase.co">
+        </div>
+        <div class="form-group">
+          <label for="setupSupabaseKey">Supabase Anon Key (Public)</label>
+          <input type="text" id="setupSupabaseKey" class="form-input" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" onclick="closeModal('supabaseConfigModal')">Cancel</button>
+        <button type="button" class="btn-submit-transaction" onclick="submitSupabaseConfig()">Save & Connect</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Supabase JS CDN (v2) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Application Logic -->
+  <script src="js/supabase-config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/transactions.js"></script>
+  <script src="js/analytics.js"></script>
+  <script src="js/advisor.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login | FINORA – Personal Finance</title>
+  <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
+  
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Custom Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/auth.css">
+</head>
+<body class="auth-body">
+
+  <div class="auth-wrapper">
+    <!-- Left Decorative Showcase Panel -->
+    <div class="auth-side-panel">
+      <div class="auth-brand">
+        <img src="assets/images/logo-light.svg" alt="FINORA Logo">
+      </div>
+
+      <div class="auth-side-content">
+        <h3>Master Your Money with Total Clarity</h3>
+        <p>FINORA empowers you to track personal spending, visualize cash flows, and receive smart AI insights to build lasting financial independence.</p>
+        
+        <div class="auth-features-list">
+          <div class="auth-feature-item">
+            <i class="fa-solid fa-check"></i>
+            <span>Instant real-time transaction tracking</span>
+          </div>
+          <div class="auth-feature-item">
+            <i class="fa-solid fa-check"></i>
+            <span>Interactive analytics & category charts</span>
+          </div>
+          <div class="auth-feature-item">
+            <i class="fa-solid fa-check"></i>
+            <span>AI financial health scoring & 50/30/20 rule</span>
+          </div>
+          <div class="auth-feature-item">
+            <i class="fa-solid fa-check"></i>
+            <span>Multi-user secure cloud database with Supabase</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="auth-side-footer">
+        <i class="fa-solid fa-shield-halved"></i>
+        <span>Bank-grade Row Level Security & 256-bit encryption</span>
+      </div>
+    </div>
+
+    <!-- Right Login Form Panel -->
+    <div class="auth-form-panel">
+      <div class="auth-header">
+        <h1>Welcome Back</h1>
+        <p>Log in to access your personal dashboard and expense records.</p>
+      </div>
+
+      <!-- Alert Box for Error / Success Messages -->
+      <div id="authAlert" class="auth-alert" style="display: none;"></div>
+
+      <form id="loginForm" class="auth-form">
+        <!-- Email Input -->
+        <div class="auth-group">
+          <label for="loginEmail">Email Address</label>
+          <div class="auth-input-wrapper">
+            <i class="fa-regular fa-envelope input-icon"></i>
+            <input type="email" id="loginEmail" class="auth-input" placeholder="name@example.com" required autocomplete="email">
+          </div>
+        </div>
+
+        <!-- Password Input with Show/Hide Toggle -->
+        <div class="auth-group">
+          <label for="loginPassword">Password</label>
+          <div class="auth-input-wrapper">
+            <i class="fa-solid fa-lock input-icon"></i>
+            <input type="password" id="loginPassword" class="auth-input has-toggle" placeholder="Enter your password" required autocomplete="current-password">
+            <button type="button" class="password-toggle-btn" data-target="loginPassword" aria-label="Toggle password visibility">
+              <i class="fa-regular fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Remember Me & Forgot Password -->
+        <div class="auth-options-row">
+          <label class="remember-label">
+            <input type="checkbox" id="rememberMe" class="remember-checkbox">
+            <span>Remember me</span>
+          </label>
+          <a href="#" id="forgotPasswordLink" class="auth-link">Forgot password?</a>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" id="btnLoginSubmit" class="btn-auth-submit">
+          <i class="fa-solid fa-arrow-right-to-bracket"></i>
+          <span>Log In</span>
+        </button>
+
+        <!-- Link to Registration -->
+        <div class="auth-switch-text">
+          Don't have an account? 
+          <a href="register.html" class="auth-link">Create New Account</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Forgot Password Modal -->
+  <div id="forgotPasswordModal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fa-solid fa-key" style="color:var(--primary);"></i>
+          <span>Reset Password</span>
+        </div>
+        <button type="button" class="btn-close-modal" onclick="closeModal('forgotPasswordModal')">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:13.5px;color:var(--text-secondary);margin-bottom:16px;">
+          Enter your registered email address and we will send you a secure link to reset your account password.
+        </p>
+        <div class="form-group">
+          <label for="resetEmail">Email Address</label>
+          <input type="email" id="resetEmail" class="form-input" placeholder="name@example.com" required>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" onclick="closeModal('forgotPasswordModal')">Cancel</button>
+        <button type="button" id="btnSendResetEmail" class="btn-submit-transaction">Send Reset Link</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Supabase JS CDN (v2) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- Finora Scripts -->
+  <script src="js/supabase-config.js"></script>
+  <script src="js/auth.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      // If already logged in, redirect straight to dashboard
+      await redirectIfLoggedIn();
+
+      // Check URL parameters for feedback
+      const params = new URLSearchParams(window.location.search);
+      const alertBox = document.getElementById('authAlert');
+
+      if (params.get('logout') === 'success') {
+        showAlert('You have been logged out successfully.', 'success');
+      } else if (params.get('redirect') === 'unauthorized') {
+        showAlert('Please sign in to access your dashboard.', 'info');
+      } else if (params.get('registered') === 'confirm') {
+        showAlert('Registration successful! Please check your email to verify your account.', 'success');
+      }
+
+      // Check remembered email
+      const rememberedEmail = localStorage.getItem('finora_remembered_email');
+      if (rememberedEmail) {
+        const emailInp = document.getElementById('loginEmail');
+        const remCheck = document.getElementById('rememberMe');
+        if (emailInp) emailInp.value = rememberedEmail;
+        if (remCheck) remCheck.checked = true;
+      }
+
+      // Init password eye toggles
+      initPasswordToggles();
+
+      // Handle Login Submit
+      const loginForm = document.getElementById('loginForm');
+      const submitBtn = document.getElementById('btnLoginSubmit');
+
+      loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+        const rememberMe = document.getElementById('rememberMe').checked;
+
+        try {
+          submitBtn.disabled = true;
+          submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Authenticating...';
+          hideAlert();
+
+          await handleLogin(email, password, rememberMe);
+
+          showAlert('Login successful! Redirecting to dashboard...', 'success');
+          setTimeout(() => {
+            window.location.replace('dashboard.html');
+          }, 800);
+
+        } catch (error) {
+          showAlert(error.message || 'Login failed. Please check your credentials.', 'error');
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket"></i> <span>Log In</span>';
+        }
+      });
+
+      // Forgot Password Modal Triggers
+      const forgotLink = document.getElementById('forgotPasswordLink');
+      const sendResetBtn = document.getElementById('btnSendResetEmail');
+
+      forgotLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        const currentEmail = document.getElementById('loginEmail').value;
+        if (currentEmail) {
+          document.getElementById('resetEmail').value = currentEmail;
+        }
+        openModal('forgotPasswordModal');
+      });
+
+      sendResetBtn.addEventListener('click', async () => {
+        const email = document.getElementById('resetEmail').value.trim();
+        if (!email) {
+          showToast('Please enter your email', 'warning');
+          return;
+        }
+
+        try {
+          sendResetBtn.disabled = true;
+          sendResetBtn.textContent = 'Sending...';
+          await handleForgotPassword(email);
+          closeModal('forgotPasswordModal');
+          showAlert(`Password reset instructions sent to ${email}`, 'success');
+        } catch (err) {
+          showToast(err.message || 'Failed to send reset email', 'error');
+        } finally {
+          sendResetBtn.disabled = false;
+          sendResetBtn.textContent = 'Send Reset Link';
+        }
+      });
+
+      function showAlert(msg, type = 'error') {
+        alertBox.textContent = msg;
+        alertBox.className = `auth-alert auth-alert-${type}`;
+        alertBox.style.display = 'flex';
+      }
+
+      function hideAlert() {
+        alertBox.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>

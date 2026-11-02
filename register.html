@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create New Account | FINORA – Personal Finance</title>
+  <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
+  
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Custom Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/auth.css">
+</head>
+<body class="auth-body">
+
+  <div class="auth-wrapper">
+    <!-- Left Decorative Showcase Panel -->
+    <div class="auth-side-panel">
+      <div class="auth-brand">
+        <img src="assets/images/logo-light.svg" alt="FINORA Logo">
+      </div>
+
+      <div class="auth-side-content">
+        <h3>Join Thousands Taking Control of Their Wealth</h3>
+        <p>Set up your free FINORA account in less than a minute. Your financial records are isolated, encrypted, and accessible only to you.</p>
+        
+        <div class="auth-features-list">
+          <div class="auth-feature-item">
+            <i class="fa-solid fa-check"></i>
+            <span>Zero spreadsheets or manual math</span>
+          </div>
+          <div class="auth-feature-item">
+            <i class="fa-solid fa-check"></i>
+            <span>Real-time budget tracking & smart warnings</span>
+          </div>
+          <div class="auth-feature-item">
+            <i class="fa-solid fa-check"></i>
+            <span>Private database with Row Level Security</span>
+          </div>
+          <div class="auth-feature-item">
+            <i class="fa-solid fa-check"></i>
+            <span>Automated AI financial diagnostic metrics</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="auth-side-footer">
+        <i class="fa-solid fa-lock"></i>
+        <span>End-to-end data security guaranteed</span>
+      </div>
+    </div>
+
+    <!-- Right Registration Form Panel -->
+    <div class="auth-form-panel">
+      <div class="auth-header">
+        <h1>Create Account</h1>
+        <p>Start tracking your expenses and mastering your savings today.</p>
+      </div>
+
+      <!-- Alert Box -->
+      <div id="authAlert" class="auth-alert" style="display: none;"></div>
+
+      <form id="registerForm" class="auth-form">
+        <!-- Full Name -->
+        <div class="auth-group">
+          <label for="regFullName">Full Name</label>
+          <div class="auth-input-wrapper">
+            <i class="fa-regular fa-user input-icon"></i>
+            <input type="text" id="regFullName" class="auth-input" placeholder="e.g. Shruti Ahire" required autocomplete="name">
+          </div>
+        </div>
+
+        <!-- Email Address -->
+        <div class="auth-group">
+          <label for="regEmail">Email Address</label>
+          <div class="auth-input-wrapper">
+            <i class="fa-regular fa-envelope input-icon"></i>
+            <input type="email" id="regEmail" class="auth-input" placeholder="name@example.com" required autocomplete="email">
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div class="auth-group">
+          <label for="regPassword">Password</label>
+          <div class="auth-input-wrapper">
+            <i class="fa-solid fa-lock input-icon"></i>
+            <input type="password" id="regPassword" class="auth-input has-toggle" placeholder="Minimum 6 characters" required autocomplete="new-password">
+            <button type="button" class="password-toggle-btn" data-target="regPassword" aria-label="Toggle password visibility">
+              <i class="fa-regular fa-eye"></i>
+            </button>
+          </div>
+          <!-- Strength Indicator -->
+          <div class="password-strength-container">
+            <div class="strength-meter-bar">
+              <div id="strengthBarFill" class="strength-meter-fill"></div>
+            </div>
+            <span id="strengthText" class="strength-text">Password strength: None</span>
+          </div>
+        </div>
+
+        <!-- Confirm Password -->
+        <div class="auth-group">
+          <label for="regConfirmPassword">Confirm Password</label>
+          <div class="auth-input-wrapper">
+            <i class="fa-solid fa-shield-check input-icon"></i>
+            <input type="password" id="regConfirmPassword" class="auth-input has-toggle" placeholder="Re-enter your password" required autocomplete="new-password">
+            <button type="button" class="password-toggle-btn" data-target="regConfirmPassword" aria-label="Toggle password visibility">
+              <i class="fa-regular fa-eye"></i>
+            </button>
+          </div>
+          <span id="passwordMatchHint" style="font-size:11.5px;display:none;margin-top:2px;"></span>
+        </div>
+
+        <!-- Terms Agreement -->
+        <div class="auth-options-row">
+          <label class="remember-label">
+            <input type="checkbox" id="agreeTerms" class="remember-checkbox" required>
+            <span>I agree to the Terms of Service & Privacy Policy</span>
+          </label>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" id="btnRegisterSubmit" class="btn-auth-submit">
+          <i class="fa-solid fa-user-plus"></i>
+          <span>Create Account</span>
+        </button>
+
+        <!-- Switch to Login -->
+        <div class="auth-switch-text">
+          Already have an account? 
+          <a href="login.html" class="auth-link">Log In</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Supabase JS CDN (v2) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- Finora Scripts -->
+  <script src="js/supabase-config.js"></script>
+  <script src="js/auth.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      // If already logged in, redirect to dashboard
+      await redirectIfLoggedIn();
+
+      // Init password eye toggles
+      initPasswordToggles();
+
+      const regForm = document.getElementById('registerForm');
+      const submitBtn = document.getElementById('btnRegisterSubmit');
+      const alertBox = document.getElementById('authAlert');
+      const passwordInput = document.getElementById('regPassword');
+      const confirmInput = document.getElementById('regConfirmPassword');
+      const strengthBar = document.getElementById('strengthBarFill');
+      const strengthText = document.getElementById('strengthText');
+      const matchHint = document.getElementById('passwordMatchHint');
+
+      // Dynamic Password Strength Meter
+      passwordInput.addEventListener('input', () => {
+        const val = passwordInput.value;
+        const res = calculatePasswordStrength(val);
+        strengthBar.style.width = res.width;
+        strengthBar.style.backgroundColor = res.color;
+        strengthText.textContent = `Password strength: ${res.label}`;
+        strengthText.style.color = res.color;
+        checkPasswordMatch();
+      });
+
+      confirmInput.addEventListener('input', checkPasswordMatch);
+
+      function checkPasswordMatch() {
+        if (!confirmInput.value) {
+          matchHint.style.display = 'none';
+          return;
+        }
+        matchHint.style.display = 'block';
+        if (passwordInput.value === confirmInput.value) {
+          matchHint.textContent = '✓ Passwords match';
+          matchHint.style.color = '#10B981';
+        } else {
+          matchHint.textContent = '✕ Passwords do not match';
+          matchHint.style.color = '#EF4444';
+        }
+      }
+
+      // Handle Registration Submit
+      regForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const fullName = document.getElementById('regFullName').value.trim();
+        const email = document.getElementById('regEmail').value.trim();
+        const password = passwordInput.value;
+        const confirmPassword = confirmInput.value;
+
+        // Validation
+        if (!fullName || fullName.length < 2) {
+          showAlert('Please enter your full name.', 'error');
+          return;
+        }
+
+        if (password.length < 6) {
+          showAlert('Password must be at least 6 characters long.', 'error');
+          return;
+        }
+
+        if (password !== confirmPassword) {
+          showAlert('Password and Confirm Password do not match.', 'error');
+          return;
+        }
+
+        try {
+          submitBtn.disabled = true;
+          submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Creating Account...';
+          hideAlert();
+
+          const result = await handleRegister(fullName, email, password);
+
+          if (result.requiresEmailVerification) {
+            showAlert(`Account created successfully! We sent a verification link to ${email}. Please confirm your email to sign in.`, 'success');
+            regForm.reset();
+            setTimeout(() => {
+              window.location.replace('login.html?registered=confirm');
+            }, 3500);
+          } else {
+            showAlert('Account created successfully! Redirecting to your dashboard...', 'success');
+            setTimeout(() => {
+              window.location.replace('dashboard.html');
+            }, 1000);
+          }
+
+        } catch (error) {
+          showAlert(error.message || 'Registration failed. Please try again.', 'error');
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<i class="fa-solid fa-user-plus"></i> <span>Create Account</span>';
+        }
+      });
+
+      function showAlert(msg, type = 'error') {
+        alertBox.textContent = msg;
+        alertBox.className = `auth-alert auth-alert-${type}`;
+        alertBox.style.display = 'flex';
+      }
+
+      function hideAlert() {
+        alertBox.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>

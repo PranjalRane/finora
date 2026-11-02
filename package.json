@@ -1,0 +1,16 @@
+{
+  "name": "finora-personal-finance",
+  "version": "1.0.0",
+  "description": "FINORA – Personal Finance & Expense Tracker",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --open",
+    "start": "vite --open",
+    "build": "vite build",
+    "preview": "vite preview",
+    "serve": "npx live-server --port=5500"
+  },
+  "devDependencies": {
+    "vite": "^5.4.10"
+  }
+}
