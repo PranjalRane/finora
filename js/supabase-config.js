@@ -4,9 +4,12 @@
  * ========================================================
  */
 
-// User Supabase Project Credentials
-const DEFAULT_SUPABASE_URL = 'https://rxxgelkxclsjavxvevvm.supabase.co';
-const DEFAULT_SUPABASE_ANON_KEY = 'sb_publishable_HSIPaKeMY3IguAyrYsSQHQ_GO9MuE9b';
+// Environment variables injected at build/dev time by Vite (.env) or fallback
+const ENV_SUPABASE_URL = typeof __SUPABASE_URL__ !== 'undefined' ? __SUPABASE_URL__ : '';
+const ENV_SUPABASE_KEY = typeof __SUPABASE_ANON_KEY__ !== 'undefined' ? __SUPABASE_ANON_KEY__ : '';
+
+const DEFAULT_SUPABASE_URL = ENV_SUPABASE_URL || 'https://rxxgelkxclsjavxvevvm.supabase.co';
+const DEFAULT_SUPABASE_ANON_KEY = ENV_SUPABASE_KEY || 'sb_publishable_HSIPaKeMY3IguAyrYsSQHQ_GO9MuE9b';
 
 // Check if credentials are stored in localStorage
 let storedUrl = localStorage.getItem('finora_supabase_url');
